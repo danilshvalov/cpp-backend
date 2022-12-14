@@ -18,7 +18,8 @@ json::value LoadJson(const std::filesystem::path& json_path) {
                                  json_path.string());
     }
 
-    std::string json_string(std::istream_iterator<char>(json_file), {});
+    std::string json_string(std::istreambuf_iterator<char>(json_file.rdbuf()),
+                            std::istreambuf_iterator<char>());
 
     return json::parse(json_string);
 }
