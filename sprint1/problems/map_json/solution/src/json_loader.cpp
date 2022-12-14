@@ -67,7 +67,7 @@ Office ParseOffice(const json::object& object) {
 
 Map ParseMap(const json::object& object) {
     Map map{
-        Map::Id(json::value_to<std::string>(object.at("name"))),
+        Map::Id(json::value_to<std::string>(object.at("id"))),
         json::value_to<std::string>(object.at("name")),
     };
 
