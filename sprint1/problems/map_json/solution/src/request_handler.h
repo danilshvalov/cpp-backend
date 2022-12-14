@@ -103,7 +103,7 @@ class RequestHandler {
         });
 
         send(MakeJsonResponse<Body, Allocator>(
-            http::status::not_found, req.version(), body, req.keep_alive()));
+            http::status::bad_request, req.version(), body, req.keep_alive()));
     }
 
     model::Game& game_;
