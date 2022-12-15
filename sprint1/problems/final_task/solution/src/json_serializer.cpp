@@ -65,7 +65,7 @@ json::value SerializeOffices(const model::Map::Offices& offices) {
     return array;
 }
 
-json::value SerializeMap(const model::Map& map) {
+json::value SerializeMapInfo(const model::Map& map) {
     return json::value{
         {"id", *map.GetId()},
         {"name", map.GetName()},
@@ -75,7 +75,7 @@ json::value SerializeMap(const model::Map& map) {
     };
 }
 
-json::value SerializeMapsInfo(const model::Game::Maps& maps) {
+json::value SerializeMapsList(const model::Game::Maps& maps) {
     json::array array;
     array.reserve(maps.size());
 
