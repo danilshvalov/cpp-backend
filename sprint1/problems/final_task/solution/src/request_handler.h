@@ -35,7 +35,7 @@ class RequestHandler {
 
         if (target.starts_with(maps_api_uri)) {
             if (target == maps_api_uri) {
-                HandleMapsInfoRequest(std::move(req), std::move(send));
+                HandleMapsListRequest(std::move(req), std::move(send));
             } else {
                 HandleMapRequest(std::move(req), std::move(send));
             }
@@ -61,10 +61,10 @@ class RequestHandler {
     }
 
     template <typename Body, typename Allocator, typename Send>
-    void HandleMapsInfoRequest(HttpRequest<Body, Allocator>&& req,
+    void HandleMapsListRequest(HttpRequest<Body, Allocator>&& req,
                                Send&& send) {
         std::string body = json::serialize(
-            json_serializer::SerializeMapsInfo(game_.GetMaps()));
+            json_serializer::SerializeMapsList(game_.GetMaps()));
 
         send(MakeJsonResponse<Body, Allocator>(http::status::ok, req.version(),
                                                body, req.keep_alive()));
@@ -88,7 +88,7 @@ class RequestHandler {
                                                    req.keep_alive()));
         } else {
             std::string body =
-                json::serialize(json_serializer::SerializeMap(*map));
+                json::serialize(json_serializer::SerializeMapInfo(*map));
 
             send(MakeJsonResponse<Body, Allocator>(
                 http::status::ok, req.version(), body, req.keep_alive()));
