@@ -10,7 +10,7 @@ json::value SerializeRoads(const model::Map::Roads& roads) {
         const auto& start = road.GetStart();
         const auto& end = road.GetEnd();
 
-        json::object object{
+        json::object object {
             {"x0", start.x},
             {"y0", start.y},
         };
@@ -34,7 +34,7 @@ json::value SerializeBuildings(const model::Map::Buildings& buildings) {
     for (const auto& building : buildings) {
         const auto& [position, size] = building.GetBounds();
 
-        array.push_back(json::value{
+        array.push_back(json::value {
             {"x", position.x},
             {"y", position.y},
             {"w", size.width},
@@ -53,7 +53,7 @@ json::value SerializeOffices(const model::Map::Offices& offices) {
         const auto& pos = office.GetPosition();
         const auto& offset = office.GetOffset();
 
-        array.push_back(json::value{
+        array.push_back(json::value {
             {"id", *office.GetId()},
             {"x", pos.x},
             {"y", pos.y},
@@ -66,7 +66,7 @@ json::value SerializeOffices(const model::Map::Offices& offices) {
 }
 
 json::value SerializeMapInfo(const model::Map& map) {
-    return json::value{
+    return json::value {
         {"id", *map.GetId()},
         {"name", map.GetName()},
         {"roads", SerializeRoads(map.GetRoads())},
@@ -80,7 +80,7 @@ json::value SerializeMapsList(const model::Game::Maps& maps) {
     array.reserve(maps.size());
 
     for (const auto& map : maps) {
-        array.push_back(json::value{
+        array.push_back(json::value {
             {"id", *map.GetId()},
             {"name", map.GetName()},
         });

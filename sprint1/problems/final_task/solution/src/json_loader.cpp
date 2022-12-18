@@ -14,18 +14,21 @@ json::value LoadJson(const std::filesystem::path& json_path) {
     std::ifstream json_file(json_path);
 
     if (!json_file) {
-        throw std::runtime_error("Cannot open configuration file " +
-                                 json_path.string());
+        throw std::runtime_error(
+            "Cannot open configuration file " + json_path.string()
+        );
     }
 
-    std::string json_string(std::istreambuf_iterator<char>(json_file.rdbuf()),
-                            std::istreambuf_iterator<char>());
+    std::string json_string(
+        std::istreambuf_iterator<char>(json_file.rdbuf()),
+        std::istreambuf_iterator<char>()
+    );
 
     return json::parse(json_string);
 }
 
 Road ParseRoad(const json::object& object) {
-    Point start{
+    Point start {
         Coord(object.at("x0").as_int64()),
         Coord(object.at("y0").as_int64()),
     };
@@ -40,12 +43,12 @@ Road ParseRoad(const json::object& object) {
 }
 
 Building ParseBuilding(const json::object& object) {
-    return Building{Rectangle{
-        Point{
+    return Building {Rectangle {
+        Point {
             Coord(object.at("x").as_int64()),
             Coord(object.at("y").as_int64()),
         },
-        Size{
+        Size {
             Dimension(object.at("w").as_int64()),
             Dimension(object.at("h").as_int64()),
         },
@@ -53,13 +56,13 @@ Building ParseBuilding(const json::object& object) {
 }
 
 Office ParseOffice(const json::object& object) {
-    return Office{
+    return Office {
         Office::Id(json::value_to<std::string>(object.at("id"))),
-        Point{
+        Point {
             Coord(object.at("x").as_int64()),
             Coord(object.at("y").as_int64()),
         },
-        Offset{
+        Offset {
             Dimension(object.at("offsetX").as_int64()),
             Dimension(object.at("offsetY").as_int64()),
         },
@@ -67,7 +70,7 @@ Office ParseOffice(const json::object& object) {
 }
 
 Map ParseMap(const json::object& object) {
-    Map map{
+    Map map {
         Map::Id(json::value_to<std::string>(object.at("id"))),
         json::value_to<std::string>(object.at("name")),
     };

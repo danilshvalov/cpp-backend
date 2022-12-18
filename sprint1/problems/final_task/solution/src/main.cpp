@@ -15,7 +15,7 @@ namespace sys = boost::system;
 namespace {
 
 // Запускает функцию fn на n потоках, включая текущий
-template <typename Fn>
+template<typename Fn>
 void RunWorkers(unsigned n, const Fn& fn) {
     n = std::max(1u, n);
     std::vector<std::jthread> workers;
@@ -41,22 +41,29 @@ int main(int argc, const char* argv[]) {
         net::io_context ioc(num_threads);
 
         net::signal_set signals(ioc, SIGINT, SIGTERM);
-        signals.async_wait([&ioc](const sys::error_code& ec,
-                                  [[maybe_unused]] int signal_number) {
+        signals.async_wait([&ioc](
+                               const sys::error_code& ec,
+                               [[maybe_unused]] int signal_number
+                           ) {
             if (!ec) {
                 ioc.stop();
             }
         });
 
-        http_handler::RequestHandler handler{game};
+        http_handler::RequestHandler handler {game};
 
         const auto address = net::ip::make_address("0.0.0.0");
         constexpr net::ip::port_type port = 8080;
-        http_server::ServeHttp(ioc, {address, port},
-                               [&handler](auto&& req, auto&& send) {
-                                   handler(std::forward<decltype(req)>(req),
-                                           std::forward<decltype(send)>(send));
-                               });
+        http_server::ServeHttp(
+            ioc,
+            {address, port},
+            [&handler](auto&& req, auto&& send) {
+                handler(
+                    std::forward<decltype(req)>(req),
+                    std::forward<decltype(send)>(send)
+                );
+            }
+        );
 
         std::cout << "Server has started..."sv << std::endl;
 

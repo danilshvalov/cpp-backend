@@ -16,26 +16,28 @@ struct ContentType {
 };
 
 class RequestHandler {
-   public:
-    explicit RequestHandler(model::Game& game) : game_{game} {}
+  public:
+    explicit RequestHandler(model::Game& game) : game_ {game} {}
 
     RequestHandler(const RequestHandler&) = delete;
     RequestHandler& operator=(const RequestHandler&) = delete;
 
-    template <typename Body, typename Allocator>
+    template<typename Body, typename Allocator>
     using HttpRequest = http::request<Body, http::basic_fields<Allocator>>;
 
-    template <typename Body, typename Allocator>
+    template<typename Body, typename Allocator>
     using HttpResponse = http::response<Body, http::basic_fields<Allocator>>;
 
-    template <typename Body, typename Allocator, typename Send>
+    template<typename Body, typename Allocator, typename Send>
     void operator()(HttpRequest<Body, Allocator>&& req, Send&& send) {
         const auto make_json_response = [&](http::status status,
                                             std::string_view body) {
             HttpResponse<Body, Allocator> response(status, req.version());
 
-            response.set(http::field::content_type,
-                         ContentType::APPLICATION_JSON);
+            response.set(
+                http::field::content_type,
+                ContentType::APPLICATION_JSON
+            );
             response.body() = body;
             response.content_length(body.size());
             response.keep_alive(req.keep_alive());
@@ -44,11 +46,13 @@ class RequestHandler {
         };
 
         const auto handle_bad_request = [&]() {
-            return make_json_response(http::status::bad_request,
-                                      json::serialize(json::value{
-                                          {"code", "badRequest"},
-                                          {"message", "Bad request"},
-                                      }));
+            return make_json_response(
+                http::status::bad_request,
+                json::serialize(json::value {
+                    {"code", "badRequest"},
+                    {"message", "Bad request"},
+                })
+            );
         };
 
         const auto get_map_info = [&](std::string map_id) {
@@ -58,23 +62,28 @@ class RequestHandler {
                 game_.FindMap(model::Map::Id(std::move(map_id)));
 
             if (!map) {
-                return make_json_response(http::status::not_found,
-                                          json::serialize(json::value{
-                                              {"code", "mapNotFound"},
-                                              {"message", "Map not found"},
-                                          }));
+                return make_json_response(
+                    http::status::not_found,
+                    json::serialize(json::value {
+                        {"code", "mapNotFound"},
+                        {"message", "Map not found"},
+                    })
+                );
             }
 
             return make_json_response(
                 http::status::ok,
-                json::serialize(json_serializer::SerializeMapInfo(*map)));
+                json::serialize(json_serializer::SerializeMapInfo(*map))
+            );
         };
 
         const auto get_maps_list = [&]() {
             return make_json_response(
                 http::status::ok,
                 json::serialize(
-                    json_serializer::SerializeMapsList(game_.GetMaps())));
+                    json_serializer::SerializeMapsList(game_.GetMaps())
+                )
+            );
         };
 
         std::string_view target = req.target();
@@ -105,11 +114,11 @@ class RequestHandler {
             return send(handle_bad_request());
         }
 
-        return send(get_map_info(
-            std::string{target.substr(1, target.find_last_not_of('/'))}));
+        return send(get_map_info(std::string {
+            target.substr(1, target.find_last_not_of('/'))}));
     }
 
-   private:
+  private:
     model::Game& game_;
 };
 
