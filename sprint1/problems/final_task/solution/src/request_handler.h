@@ -86,12 +86,16 @@ class RequestHandler {
             );
         };
 
+        if (req.method() != http::verb::get) {
+            return send(handle_bad_request());
+        }
+
         std::string_view target = req.target();
         const std::string_view api_uri = "/api";
         std::string_view maps_uri = "/v1/maps";
 
-        if (req.method() != http::verb::get) {
-            return send(handle_bad_request());
+        if (target.back() == '/') {
+            target.remove_suffix(1);
         }
 
         if (!target.starts_with(api_uri)) {
@@ -106,7 +110,7 @@ class RequestHandler {
 
         target.remove_prefix(maps_uri.size());
 
-        if (target.empty() || target == "/") {
+        if (target.empty()) {
             return send(get_maps_list());
         }
 
@@ -114,8 +118,8 @@ class RequestHandler {
             return send(handle_bad_request());
         }
 
-        return send(get_map_info(std::string {
-            target.substr(1, target.find_last_not_of('/'))}));
+        target.remove_prefix(1);
+        return send(get_map_info(std::string(target)));
     }
 
   private:
