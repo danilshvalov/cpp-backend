@@ -40,7 +40,9 @@ void SessionBase::OnRead(sys::error_code ec, size_t bytes_read) {
 }
 
 void SessionBase::OnWrite(
-    bool close, sys::error_code ec, size_t bytes_written
+    bool close,
+    sys::error_code ec,
+    size_t bytes_written
 ) {
     if (ec) {
         ReportError(ec, "write");

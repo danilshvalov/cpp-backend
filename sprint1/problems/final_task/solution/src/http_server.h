@@ -149,7 +149,9 @@ class Listener: public std::enable_shared_from_this<Listener<RequestHandler>> {
 
 template<typename RequestHandler>
 void ServeHttp(
-    net::io_context& io, const tcp::endpoint& endpoint, RequestHandler&& handler
+    net::io_context& io,
+    const tcp::endpoint& endpoint,
+    RequestHandler&& handler
 ) {
     using MyListener = Listener<std::decay_t<RequestHandler>>;
     std::make_shared<MyListener>(
