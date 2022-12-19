@@ -36,7 +36,7 @@ json::value SerializeBuildings(const model::Map::Buildings& buildings) {
     const json::string_view x_key = "x";
     const json::string_view y_key = "y";
     const json::string_view width_key = "w";
-    const json::string_view height_key = "w";
+    const json::string_view height_key = "h";
 
     json::array array;
     array.reserve(buildings.size());
