@@ -11,11 +11,13 @@ using Dimension = int;
 using Coord = Dimension;
 
 struct Point {
-    Coord x, y;
+    Coord x;
+    Coord y;
 };
 
 struct Size {
-    Dimension width, height;
+    Dimension width;
+    Dimension height;
 };
 
 struct Rectangle {
@@ -24,7 +26,8 @@ struct Rectangle {
 };
 
 struct Offset {
-    Dimension dx, dy;
+    Dimension dx;
+    Dimension dy;
 };
 
 class Road {
