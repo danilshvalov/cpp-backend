@@ -220,7 +220,10 @@ class RequestHandler {
             return send(make_string_response(http::status::not_found, message));
         };
 
-        const std::string path = static_path_ + DecodeUrl(req.target());
+        fs::path path = static_path_ + DecodeUrl(req.target());
+        if (fs::is_directory(path)) {
+            path /= "index.html";
+        }
 
         if (!IsSubPath(path, static_path_)) {
             return handle_bad_request("Incorrect URL");
@@ -228,14 +231,14 @@ class RequestHandler {
 
         http::file_body::value_type file;
         if (sys::error_code ec;
-            file.open(path.data(), beast::file_mode::read, ec), ec) {
+            file.open(path.c_str(), beast::file_mode::read, ec), ec) {
             return handle_not_found_request("This page does not exist");
         }
 
         return send(make_file_response(
             http::status::ok,
             std::move(file),
-            GetMimeType(path)
+            GetMimeType(path.c_str())
         ));
     }
 
