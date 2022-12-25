@@ -28,6 +28,10 @@ void JsonFormatter(
 
 void InitBoostLogFilter() {
     logging::add_common_attributes();
-    logging::add_console_log(std::cout, keywords::format = &JsonFormatter);
+    logging::add_console_log(
+        std::cout,
+        keywords::auto_flush = true,
+        keywords::format = &JsonFormatter
+    );
 }
 }  // namespace json_logger

@@ -78,7 +78,7 @@ int main(int argc, const char* argv[]) {
                                            {"address", address.to_string()},
                                        }
                                    )
-                                << "server started";
+                                << "Server has started...";
 
         RunWorkers(std::max(1u, num_threads), [&ioc] { ioc.run(); });
 
