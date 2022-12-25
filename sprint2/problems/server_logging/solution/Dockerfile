@@ -9,7 +9,7 @@ RUN apt update && \
 
 COPY conanfile.txt /app/
 RUN mkdir /app/build && cd /app/build && \
-    conan install .. --build=missing
+    conan install .. --build=missing -s compiler.libcxx=libstdc++11
 
 COPY ./src /app/src
 COPY CMakeLists.txt /app/
