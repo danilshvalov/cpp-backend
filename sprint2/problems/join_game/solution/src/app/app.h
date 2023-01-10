@@ -35,7 +35,6 @@ class Application {
     using Players = std::vector<Player*>;
 
     Application(net::io_context& io, model::Game game) :
-        io_(io),
         strand_(net::make_strand(io)),
         game_(std::move(game)) {}
 
@@ -132,7 +131,6 @@ class Application {
         return &sessions_.back();
     }
 
-    net::io_context& io_;
     Strand strand_;
     model::Game game_;
     std::vector<std::unique_ptr<Player>> players_;

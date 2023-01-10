@@ -2,6 +2,7 @@
 #include "serde/json.h"
 #include "model/map.h"
 #include "app/app.h"
+#include "web/core.h"
 #include "web/server.h"
 #include "web/content_type.h"
 #include "web/utils.h"
@@ -25,17 +26,6 @@ namespace fs = std::filesystem;
 
 using Strand = net::strand<net::io_context::executor_type>;
 
-template<typename Body, typename Allocator>
-using HttpRequest = http::request<Body, http::basic_fields<Allocator>>;
-
-template<typename Body, typename Allocator>
-using HttpResponse = http::response<Body, http::basic_fields<Allocator>>;
-
-using StringRequest = http::request<http::string_body>;
-
-using StringResponse = http::response<http::string_body>;
-using FileResponse = http::response<http::file_body>;
-
 struct ResponseConfig {
     bool keep_alive = false;
     bool no_cache = false;
@@ -51,7 +41,7 @@ class ResponseBuilder {
 
     ResponseBuilder(Config config = {}) : config_(std::move(config)) {}
 
-    ResponseBuilder(const StringRequest& req) {
+    ResponseBuilder(const web::StringRequest& req) {
         res_.version(req.version());
         res_.keep_alive(req.keep_alive());
         config_.add_body = req.method() != http::verb::head;
@@ -171,11 +161,11 @@ class JsonResponseBuilder : public ResponseBuilder<http::string_body> {
 
 class ApiHandlerImpl {
   public:
-    ApiHandlerImpl(app::Application& app, StringRequest&& req) :
+    ApiHandlerImpl(app::Application& app, web::StringRequest&& req) :
         app_(app),
         req_(std::move(req)) {}
 
-    StringResponse HandleApiRequest() const {
+    web::StringResponse HandleApiRequest() const {
         std::string_view target = req_.target();
         if (target.back() == '/') {
             target.remove_suffix(1);
@@ -216,7 +206,7 @@ class ApiHandlerImpl {
     }
 
   private:
-    StringResponse HandleMapInfoRequest(std::string map_id) const {
+    web::StringResponse HandleMapInfoRequest(std::string map_id) const {
         const model::Map* map = app_.FindMap(model::Map::Id(std::move(map_id)));
 
         JsonResponseBuilder res(req_);
@@ -230,13 +220,13 @@ class ApiHandlerImpl {
         return res;
     };
 
-    StringResponse HandleMapsListRequest() const {
+    web::StringResponse HandleMapsListRequest() const {
         JsonResponseBuilder res(req_);
         res.SetJsonBody(serde::json::SerializeMapsList(app_.ListMaps()));
         return res;
     };
 
-    StringResponse HandleGameJoinRequest() const {
+    web::StringResponse HandleGameJoinRequest() const {
         JsonResponseBuilder res(req_);
         res.SetNoCache();
 
@@ -275,7 +265,7 @@ class ApiHandlerImpl {
         }
     }
 
-    StringResponse HandlePlayersRequest() const {
+    web::StringResponse HandlePlayersRequest() const {
         JsonResponseBuilder res(req_);
         res.SetNoCache();
 
@@ -313,7 +303,7 @@ class ApiHandlerImpl {
     }
 
     app::Application& app_;
-    StringRequest req_;
+    web::StringRequest req_;
 
     std::string api_uri_ = "/api/v1";
     std::string maps_uri_ = "/maps";
@@ -323,11 +313,11 @@ class ApiHandler {
   public:
     ApiHandler(app::Application& app) : app_(app) {}
 
-    bool IsApiRequest(const StringRequest& req) {
+    bool IsApiRequest(const web::StringRequest& req) {
         return req.target().starts_with(uri_prefix_);
     }
 
-    StringResponse HandleApiRequest(StringRequest&& req) {
+    web::StringResponse HandleApiRequest(web::StringRequest&& req) {
         return ApiHandlerImpl(app_, std::move(req)).HandleApiRequest();
     }
 
@@ -354,7 +344,7 @@ class RequestHandler : public std::enable_shared_from_this<RequestHandler> {
     RequestHandler& operator=(const RequestHandler&) = delete;
 
     template<typename Body, typename Allocator, typename Send>
-    void operator()(HttpRequest<Body, Allocator>&& req, Send&& send) {
+    void operator()(web::HttpRequest<Body, Allocator>&& req, Send&& send) {
         if (req.target().starts_with(api_uri_)) {
             // send(api_handler_.HandleApiRequest(std::move(req)));
             return net::dispatch(
@@ -375,10 +365,13 @@ class RequestHandler : public std::enable_shared_from_this<RequestHandler> {
 
   private:
     template<typename Body, typename Allocator, typename Send>
-    void HandleStaticRequest(HttpRequest<Body, Allocator>&& req, Send&& send) {
+    void HandleStaticRequest(
+        web::HttpRequest<Body, Allocator>&& req,
+        Send&& send
+    ) {
         const auto make_string_response = [&](http::status status,
                                               std::string_view body) {
-            StringResponse res(status, req.version());
+            web::StringResponse res(status, req.version());
 
             res.set(http::field::content_type, web::ContentType::text::plain);
             res.body() = body;
@@ -391,7 +384,7 @@ class RequestHandler : public std::enable_shared_from_this<RequestHandler> {
         const auto make_file_response = [&](http::status status,
                                             http::file_body::value_type&& body,
                                             std::string_view content_type) {
-            FileResponse res(status, req.version());
+            web::FileResponse res(status, req.version());
 
             res.set(http::field::content_type, content_type);
             if (req.method() == http::verb::get) {
