@@ -33,14 +33,14 @@ void RunWorkers(unsigned n, const Fn& fn) {
 }  // namespace
 
 int main(int argc, const char* argv[]) {
+    json_logger::InitBoostLogFilter();
+
     if (argc != 3) {
         std::cerr << "Usage: game_server <game-config-json> <static-files>"
                   << std::endl;
         return EXIT_FAILURE;
     }
     try {
-        json_logger::InitBoostLogFilter();
-
         model::Game game = json_loader::LoadGame(argv[1]);
 
         const unsigned num_threads = std::thread::hardware_concurrency();
