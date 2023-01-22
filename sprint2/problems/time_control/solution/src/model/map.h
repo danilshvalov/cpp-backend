@@ -5,7 +5,6 @@
 #include "model/building.h"
 #include "model/office.h"
 #include "model/dog.h"
-#include "model/road_manager.h"
 
 #include <string>
 #include <unordered_map>
@@ -42,7 +41,7 @@ class Map {
     }
 
     const Roads& GetRoads() const noexcept {
-        return road_manager_.GetRoads();
+        return roads_;
     }
 
     const Offices& GetOffices() const noexcept {
@@ -54,19 +53,11 @@ class Map {
     }
 
     void AddRoad(const Road& road) {
-        road_manager_.AddRoad(road);
+        roads_.emplace_back(road);
     }
 
     void AddBuilding(const Building& building) {
         buildings_.emplace_back(building);
-    }
-
-    MovementResult MakeMovement(
-        const Position& position,
-        const Speed& speed,
-        const std::chrono::milliseconds& time_delta
-    ) const {
-        return road_manager_.MakeMovement(position, speed, time_delta);
     }
 
     void AddOffice(Office office);
@@ -77,7 +68,7 @@ class Map {
 
     Id id_;
     std::string name_;
-    RoadManager road_manager_;
+    Roads roads_;
     Buildings buildings_;
     OfficeIdToIndex warehouse_id_to_index_;
     Offices offices_;

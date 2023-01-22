@@ -78,17 +78,8 @@ class Application {
     }
 
     void UpdateGameState(const std::chrono::milliseconds& time_delta) {
-        for (const auto& player : players_) {
-            model::Dog* dog = player->GetDog();
-            GameSession* session = player->GetSession();
-
-            model::MovementResult movement = session->GetMap().MakeMovement(
-                dog->GetPosition(),
-                dog->GetSpeed(),
-                time_delta
-            );
-            dog->SetPosition(movement.position);
-            dog->SetSpeed(movement.speed);
+        for (const auto& session : sessions_) {
+            session->UpdateGameState(time_delta);
         }
     }
 

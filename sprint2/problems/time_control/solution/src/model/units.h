@@ -1,16 +1,48 @@
 #pragma once
 
 #include <stdexcept>
+#include <cmath>
 
 namespace model {
 
-using Dimension = int;
+using Dimension = double;
 using Coord = Dimension;
 
 struct Point {
     Coord x;
     Coord y;
+
+    bool operator<=(const Point& other) const {
+        return x <= other.x && y <= other.y;
+    }
+
+    bool operator<(const Point& other) const {
+        return x < other.x && y < other.y;
+    }
+
+    bool operator>=(const Point& other) const {
+        return x >= other.x && y >= other.y;
+    }
+
+    bool operator>(const Point& other) const {
+        return x > other.x && y > other.y;
+    }
+
+    bool operator==(const Point& other) const {
+        return x == other.x && y == other.y;
+    }
+
+    bool operator!=(const Point& other) const {
+        return x != other.x || y != other.y;
+    }
 };
+
+// TODO: remove inline
+inline Dimension FindDistance(const Point& lhs, const Point& rhs) {
+    Dimension distance =
+        std::pow(rhs.x - lhs.x, 2) + std::pow(rhs.y - lhs.y, 2);
+    return std::sqrt(distance);
+}
 
 struct Size {
     Dimension width;
@@ -51,10 +83,13 @@ inline Direction GetOppositeDirection(Direction direction) {
     }
 }
 
-struct Position {
-    double x;
-    double y;
-};
+// TODO: remove
+using Position = Point;
+
+// struct Position {
+//     double x;
+//     double y;
+// };
 
 struct Speed {
     Speed(double x, double y) : x(x), y(y) {};
@@ -111,6 +146,7 @@ inline Direction GetDirectionFromSpeed(const Speed& speed) {
     }
 }
 
+// TODO: remove
 struct MovementResult {
     Position position;
     Speed speed;
