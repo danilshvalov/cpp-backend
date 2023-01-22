@@ -24,6 +24,7 @@ void JsonFormatter(
     }
 
     strm << log;
+    strm.flush();
 }
 
 void InitBoostLogFilter() {
