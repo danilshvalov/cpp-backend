@@ -28,7 +28,7 @@ std::optional<Args> ParseCommandLine(int argc, const char* const argv[]) {
 
     if (vm.contains("help")) {
         std::cout << desc;
-        std::exit(0);
+        return std::nullopt;
     }
 
     if (!vm.contains("config-file")) {
