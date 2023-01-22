@@ -5,9 +5,11 @@
 #include <iostream>
 #include <thread>
 
-#include "json_loader.h"
-#include "request_handler.h"
-#include "json_logger.h"
+#include "serde/json.h"
+#include "handlers/request_handler.h"
+#include "utils/thread.h"
+#include "logger/json.h"
+#include "app/app.h"
 
 using namespace std::literals;
 namespace net = boost::asio;
@@ -15,64 +17,46 @@ namespace sys = boost::system;
 namespace logging = boost::log;
 namespace json = boost::json;
 
-namespace {
-
-// Запускает функцию fn на n потоках, включая текущий
-template<typename Fn>
-void RunWorkers(unsigned n, const Fn& fn) {
-    n = std::max(1u, n);
-    std::vector<std::jthread> workers;
-    workers.reserve(n - 1);
-    // Запускаем n-1 рабочих потоков, выполняющих функцию fn
-    while (--n) {
-        workers.emplace_back(fn);
-    }
-    fn();
-}
-
-}  // namespace
-
 int main(int argc, const char* argv[]) {
-    json_logger::InitBoostLogFilter();
-
     if (argc != 3) {
         std::cerr << "Usage: game_server <game-config-json> <static-files>"
                   << std::endl;
         return EXIT_FAILURE;
     }
     try {
-        model::Game game = json_loader::LoadGame(argv[1]);
+        logger::json::InitBoostLogFilter();
 
         const unsigned num_threads = std::thread::hardware_concurrency();
-        net::io_context ioc(num_threads);
+        net::io_context io(num_threads);
 
-        net::signal_set signals(ioc, SIGINT, SIGTERM);
-        signals.async_wait([&ioc](
+        app::Application app(io, serde::json::LoadGame(argv[1]));
+
+        net::signal_set signals(io, SIGINT, SIGTERM);
+        signals.async_wait([&io](
                                const sys::error_code& ec,
                                [[maybe_unused]] int signal_number
                            ) {
             if (!ec) {
-                ioc.stop();
+                io.stop();
             }
         });
 
-        http_handler::RequestHandler handler(game, argv[2]);
+        auto handler = std::make_shared<handlers::RequestHandler>(app, argv[2]);
 
         const auto address = net::ip::make_address("0.0.0.0");
         constexpr net::ip::port_type port = 8080;
-        http_server::ServeHttp(
-            ioc,
+        web::ServeHttp(
+            io,
             {address, port},
             [&handler](auto&& req, auto&& send) {
-                handler(
-                    std::forward<decltype(req)>(req),
-                    std::forward<decltype(send)>(send)
-                );
+                (*handler
+                )(std::forward<decltype(req)>(req),
+                  std::forward<decltype(send)>(send));
             }
         );
 
         BOOST_LOG_TRIVIAL(info) << logging::add_value(
-                                       json_logger::additional_data,
+                                       logger::json::additional_data,
                                        json::value {
                                            {"port", port},
                                            {"address", address.to_string()},
@@ -80,16 +64,16 @@ int main(int argc, const char* argv[]) {
                                    )
                                 << "Server has started...";
 
-        RunWorkers(std::max(1u, num_threads), [&ioc] { ioc.run(); });
+        utils::RunWorkers(std::max(1u, num_threads), [&io] { io.run(); });
 
         BOOST_LOG_TRIVIAL(info) << logging::add_value(
-                                       json_logger::additional_data,
+                                       logger::json::additional_data,
                                        json::value {{"code", 0}}
                                    )
                                 << "server exited";
     } catch (const std::exception& ex) {
         BOOST_LOG_TRIVIAL(info) << logging::add_value(
-                                       json_logger::additional_data,
+                                       logger::json::additional_data,
                                        json::value {
                                            {"code", EXIT_FAILURE},
                                            {"exception", ex.what()},
