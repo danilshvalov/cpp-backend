@@ -64,11 +64,17 @@ class ResponseBuilder {
         res_.set(http::field::allow, allow);
     }
 
-    void SetJsonBody(json::value value, http::status status = http::status::ok) {
+    void SetJsonBody(
+        json::value value,
+        http::status status = http::status::ok
+    ) {
         SetStatus(status);
         std::string body = json::serialize(value);
 
-        res_.set(http::field::content_type, web::ContentType::application::json);
+        res_.set(
+            http::field::content_type,
+            web::ContentType::application::json
+        );
         res_.content_length(body.size());
 
         if (config_.add_body) {
@@ -156,7 +162,9 @@ class JsonResponseBuilder : public ResponseBuilder<http::string_body> {
 
 class ApiHandlerImpl {
   public:
-    ApiHandlerImpl(app::Application& app, web::StringRequest&& req) : app_(app), req_(std::move(req)) {}
+    ApiHandlerImpl(app::Application& app, web::StringRequest&& req) :
+        app_(app),
+        req_(std::move(req)) {}
 
     web::StringResponse HandleApiRequest() const {
         std::string_view target = req_.target();
@@ -182,7 +190,7 @@ class ApiHandlerImpl {
             return HandlePlayerAction();
         }
 
-        if (target == "/game/tick") {
+        if (target == "/game/tick" && !app_.HasTickPeriod()) {
             return HandleGameTick();
         }
 
@@ -252,7 +260,8 @@ class ApiHandlerImpl {
                 return res;
             }
 
-            app::JoinGameResult info = app_.JoinGame(std::move(map_id), std::move(name));
+            app::JoinGameResult info =
+                app_.JoinGame(std::move(map_id), std::move(name));
 
             res.SetJsonBody({
                 {"authToken", *info.token},
@@ -273,7 +282,8 @@ class ApiHandlerImpl {
         JsonResponseBuilder res(req_);
         res.SetNoCache();
 
-        if (auto method = req_.method(); method != http::verb::get && method != http::verb::head) {
+        if (auto method = req_.method();
+            method != http::verb::get && method != http::verb::head) {
             res.SetInvalidMethod();
             res.SetAllow("GET,HEAD");
             return res;
@@ -290,7 +300,8 @@ class ApiHandlerImpl {
         JsonResponseBuilder res(req_);
         res.SetNoCache();
 
-        if (auto method = req_.method(); method != http::verb::get && method != http::verb::head) {
+        if (auto method = req_.method();
+            method != http::verb::get && method != http::verb::head) {
             res.SetInvalidMethod();
             res.SetAllow("GET,HEAD");
             return res;
@@ -313,8 +324,8 @@ class ApiHandlerImpl {
             return res;
         }
 
-        if (auto it = req_.find(http::field::content_type);
-            it == req_.end() || it->value() != web::ContentType::application::json) {
+        if (auto it = req_.find(http::field::content_type); it == req_.end() ||
+            it->value() != web::ContentType::application::json) {
             res.SetInvalidArgument("Invalid content type");
             return res;
         }
@@ -346,8 +357,8 @@ class ApiHandlerImpl {
             return res;
         }
 
-        if (auto it = req_.find(http::field::content_type);
-            it == req_.end() || it->value() != web::ContentType::application::json) {
+        if (auto it = req_.find(http::field::content_type); it == req_.end() ||
+            it->value() != web::ContentType::application::json) {
             res.SetInvalidArgument("Invalid content type");
             return res;
         }
@@ -431,19 +442,28 @@ class RequestHandler : public std::enable_shared_from_this<RequestHandler> {
             // send(api_handler_.HandleApiRequest(std::move(req)));
             return net::dispatch(
                 app_.GetStrand(),
-                [self = shared_from_this(), req = std::move(req), send = std::forward<Send>(send)]() mutable {
+                [self = shared_from_this(),
+                 req = std::move(req),
+                 send = std::forward<Send>(send)]() mutable {
                     send(self->api_handler_.HandleApiRequest(std::move(req)));
                 }
             );
         } else {
-            return HandleStaticRequest(std::move(req), std::forward<Send>(send));
+            return HandleStaticRequest(
+                std::move(req),
+                std::forward<Send>(send)
+            );
         }
     }
 
   private:
     template<typename Body, typename Allocator, typename Send>
-    void HandleStaticRequest(web::HttpRequest<Body, Allocator>&& req, Send&& send) {
-        const auto make_string_response = [&](http::status status, std::string_view body) {
+    void HandleStaticRequest(
+        web::HttpRequest<Body, Allocator>&& req,
+        Send&& send
+    ) {
+        const auto make_string_response = [&](http::status status,
+                                              std::string_view body) {
             web::StringResponse res(status, req.version());
 
             res.set(http::field::content_type, web::ContentType::text::plain);
@@ -454,24 +474,26 @@ class RequestHandler : public std::enable_shared_from_this<RequestHandler> {
             return res;
         };
 
-        const auto make_file_response =
-            [&](http::status status, http::file_body::value_type&& body, std::string_view content_type) {
-                web::FileResponse res(status, req.version());
+        const auto make_file_response = [&](http::status status,
+                                            http::file_body::value_type&& body,
+                                            std::string_view content_type) {
+            web::FileResponse res(status, req.version());
 
-                res.set(http::field::content_type, content_type);
-                if (req.method() == http::verb::get) {
-                    res.body() = std::move(body);
-                    res.prepare_payload();
-                } else {
-                    res.content_length(body.size());
-                }
-                res.keep_alive(req.keep_alive());
+            res.set(http::field::content_type, content_type);
+            if (req.method() == http::verb::get) {
+                res.body() = std::move(body);
+                res.prepare_payload();
+            } else {
+                res.content_length(body.size());
+            }
+            res.keep_alive(req.keep_alive());
 
-                return res;
-            };
+            return res;
+        };
 
         const auto handle_bad_request = [&](std::string_view message) {
-            return send(make_string_response(http::status::bad_request, message));
+            return send(make_string_response(http::status::bad_request, message)
+            );
         };
 
         const auto handle_not_found_request = [&](std::string_view message) {
@@ -488,11 +510,16 @@ class RequestHandler : public std::enable_shared_from_this<RequestHandler> {
         }
 
         http::file_body::value_type file;
-        if (sys::error_code ec; file.open(path.c_str(), beast::file_mode::read, ec), ec) {
+        if (sys::error_code ec;
+            file.open(path.c_str(), beast::file_mode::read, ec), ec) {
             return handle_not_found_request("This page does not exist");
         }
 
-        return send(make_file_response(http::status::ok, std::move(file), web::GetMimeType(path.c_str())));
+        return send(make_file_response(
+            http::status::ok,
+            std::move(file),
+            web::GetMimeType(path.c_str())
+        ));
     }
 
     app::Application& app_;

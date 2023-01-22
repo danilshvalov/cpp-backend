@@ -24,9 +24,6 @@ namespace app {
 
 namespace net = boost::asio;
 
-// TODO:
-using MapIdHasher = utils::TaggedHasher<model::Map::Id>;
-
 struct JoinGameResult {
     Token token;
     Player::Id id;
@@ -127,6 +124,10 @@ class Application {
         // TODO: rework
         player->GetDog()->SetSpeed(model::Speed(dog_speed, direction));
         player->GetDog()->SetDirection(direction);
+    }
+
+    bool HasTickPeriod() const {
+        return ticker_ != nullptr;
     }
 
   private:
