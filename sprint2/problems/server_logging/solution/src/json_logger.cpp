@@ -1,5 +1,7 @@
 #include "json_logger.h"
 
+#include <boost/date_time.hpp>
+
 namespace json_logger {
 
 namespace keywords = boost::log::keywords;
@@ -9,10 +11,8 @@ void JsonFormatter(
     const logging::record_view& rec,
     logging::formatting_ostream& strm
 ) {
-    auto ts = rec[timestamp];
-
     json::object log({
-        {"timestamp", to_iso_extended_string(*ts)},
+        {"timestamp", boost::posix_time::to_iso_extended_string(boost::posix_time::microsec_clock::local_time())},
     });
 
     if (auto message = rec[expr::smessage]; message) {
@@ -27,7 +27,6 @@ void JsonFormatter(
 }
 
 void InitBoostLogFilter() {
-    logging::add_common_attributes();
     logging::add_console_log(
         std::cout,
         keywords::auto_flush = true,
