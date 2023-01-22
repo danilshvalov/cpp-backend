@@ -17,10 +17,15 @@ json::value LoadJson(const std::filesystem::path& json_path) {
     std::ifstream json_file(json_path);
 
     if (!json_file) {
-        throw std::runtime_error("Cannot open configuration file " + json_path.string());
+        throw std::runtime_error(
+            "Cannot open configuration file " + json_path.string()
+        );
     }
 
-    std::string json_string(std::istreambuf_iterator<char>(json_file.rdbuf()), std::istreambuf_iterator<char>());
+    std::string json_string(
+        std::istreambuf_iterator<char>(json_file.rdbuf()),
+        std::istreambuf_iterator<char>()
+    );
 
     return json::parse(json_string);
 }
@@ -285,7 +290,7 @@ json::value SerializePlayers(const app::Application::Players& players) {
     return object;
 }
 
-json::value SerializePosition(const model::Position& position) {
+json::value SerializePosition(const model::Point& position) {
     return json::array {position.x, position.y};
 }
 
@@ -304,6 +309,8 @@ json::value SerializeDirection(model::Direction direction) {
         case model::Direction::SOUTH:
             return "D";
         case model::Direction::NONE:
+            return "";
+        default:
             return "";
     }
 }

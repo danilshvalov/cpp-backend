@@ -60,7 +60,7 @@ using Token = utils::Tagged<std::string, class TokenTag>;
 
 class PlayerTokens {
   public:
-    app::Player* FindPlayerBy(const Token& token) {
+    app::Player* FindPlayerBy(const Token& token) const {
         if (const auto it = players_.find(token); it != players_.end()) {
             return it->second;
         }

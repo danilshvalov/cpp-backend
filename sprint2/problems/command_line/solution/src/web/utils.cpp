@@ -2,7 +2,6 @@
 
 #include "web/utils.h"
 #include "web/content_type.h"
-#include "logger/json.h"
 
 #include <boost/beast/core/string.hpp>
 
@@ -12,8 +11,6 @@
 namespace web {
 
 namespace beast = boost::beast;
-namespace json = boost::json;
-namespace logging = boost::log;
 
 std::string DecodeUrl(std::string_view url) {
     std::string result;
@@ -84,18 +81,6 @@ std::string_view GetMimeType(std::string_view path) {
     } else {
         return ContentType::application::octet_stream;
     }
-}
-
-void ReportError(sys::error_code ec, std::string_view where) {
-    BOOST_LOG_TRIVIAL(error) << logging::add_value(
-                                    logger::json::additional_data,
-                                    json::value {
-                                        {"code", ec.value()},
-                                        {"text", ec.message()},
-                                        {"where", where},
-                                    }
-                                )
-                             << "error";
 }
 
 }  // namespace web

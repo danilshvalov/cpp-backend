@@ -1,6 +1,7 @@
 #include "sdk.h"
 
 #include "serde/json.h"
+#include "web/server.h"
 #include "handlers/request_handler.h"
 #include "utils/thread.h"
 #include "logger/json.h"

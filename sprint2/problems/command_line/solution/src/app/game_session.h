@@ -5,6 +5,8 @@
 #include "utils/random.h"
 
 #include <optional>
+#include <chrono>
+#include <deque>
 
 namespace app {
 
@@ -23,23 +25,21 @@ class GameSession {
     }
 
     model::Dog* CreateDog(bool randomize_spawn_points) {
-        model::Position start_position = randomize_spawn_points
+        model::Point start_position = randomize_spawn_points
             ? MakeRandomPosition()
             : MakeDefaultPosition();
 
-        return dogs_
-            .emplace_back(std::make_unique<model::Dog>(
-                start_position,
-                model::Speed(0, 0),
-                model::Direction::NORTH
-            ))
-            .get();
+        return &dogs_.emplace_back(
+            start_position,
+            model::Speed(0, 0),
+            model::Direction::NORTH
+        );
     }
 
-    void UpdateGameState(const std::chrono::milliseconds& time_delta) const {
-        for (const auto& dog : dogs_) {
-            const auto& position = dog->GetPosition();
-            const auto& speed = dog->GetSpeed();
+    void UpdateGameState(const std::chrono::milliseconds& time_delta) {
+        for (auto& dog : dogs_) {
+            const auto& position = dog.GetPosition();
+            const auto& speed = dog.GetSpeed();
 
             model::Point new_position = {
                 position.x + speed.x * time_delta.count() / 1000.0,
@@ -49,24 +49,24 @@ class GameSession {
             auto suitable_point = FindSuitablePoint(position, new_position);
 
             if (suitable_point) {
-                dog->SetPosition(*suitable_point);
+                dog.SetPosition(*suitable_point);
                 if (suitable_point->x != new_position.x ||
                     suitable_point->y != new_position.y) {
-                    dog->SetSpeed(model::Speed(0, 0));
+                    dog.SetSpeed(model::Speed(0, 0));
                 }
             }
         }
     }
 
   private:
-    model::Position MakeRandomPosition() const {
+    model::Point MakeRandomPosition() const {
         const auto& roads = map_.GetRoads();
         size_t road_index =
             utils::GenerateRandomNumber<size_t>(0, roads.size() - 1);
         const auto& road = roads[road_index];
 
         if (road.IsHorizontal()) {
-            return model::Position {
+            return model::Point {
                 .x = utils::GenerateRandomNumber<double>(
                     road.GetStart().x,
                     road.GetEnd().x
@@ -74,7 +74,7 @@ class GameSession {
                 .y = static_cast<double>(road.GetStart().y),
             };
         } else {
-            return model::Position {
+            return model::Point {
                 .x = static_cast<double>(road.GetStart().x),
                 .y = utils::GenerateRandomNumber<double>(
                     road.GetStart().y,
@@ -84,7 +84,7 @@ class GameSession {
         }
     }
 
-    model::Position MakeDefaultPosition() const {
+    model::Point MakeDefaultPosition() const {
         const auto& road = map_.GetRoads().front();
         return road.GetStart();
     }
@@ -125,11 +125,8 @@ class GameSession {
     }
 
     Id id_;
-    std::vector<std::unique_ptr<model::Dog>> dogs_;
+    std::deque<model::Dog> dogs_;
     const model::Map& map_;
 };
-
-// TODO:
-using GameSessionIdHasher = utils::TaggedHasher<GameSession::Id>;
 
 }  // namespace app

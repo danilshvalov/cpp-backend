@@ -1,6 +1,5 @@
 #pragma once
 
-#include "app/core.h"
 #include "app/game_session.h"
 #include "app/player.h"
 
@@ -31,6 +30,8 @@ struct JoinGameResult {
 
 class Application {
   public:
+    using Strand = net::strand<net::io_context::executor_type>;
+
     using Players = std::vector<Player*>;
 
     Application(
@@ -64,8 +65,7 @@ class Application {
         return game_.FindMap(id);
     }
 
-    // TODO: add const
-    bool HasPlayer(const Token& token) {
+    bool HasPlayer(const Token& token) const {
         return player_tokens_.FindPlayerBy(token) != nullptr;
     }
 
@@ -74,7 +74,6 @@ class Application {
 
         Player* player = player_tokens_.FindPlayerBy(token);
         if (!player) {
-            // TODO: change exception message
             throw std::invalid_argument("Player doesn't exists");
         }
 
@@ -121,7 +120,6 @@ class Application {
         Player* player = player_tokens_.FindPlayerBy(token);
         double dog_speed = player->GetSession()->GetMap().GetDogSpeed();
 
-        // TODO: rework
         player->GetDog()->SetSpeed(model::Speed(dog_speed, direction));
         player->GetDog()->SetDirection(direction);
     }
@@ -183,7 +181,7 @@ class Application {
     std::unordered_map<
         GameSession::Id,
         std::vector<Player*>,
-        GameSessionIdHasher>
+        utils::TaggedHasher<GameSession::Id>>
         session_players_;
     MapIdToIndex map_id_to_index;
 };

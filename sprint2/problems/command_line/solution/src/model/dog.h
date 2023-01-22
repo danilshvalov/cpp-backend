@@ -8,16 +8,16 @@ namespace model {
 
 class Dog {
   public:
-    Dog(Position position, Speed speed, Direction direction) :
+    Dog(Point position, Speed speed, Direction direction) :
         position_(std::move(position)),
         speed_(std::move(speed)),
         direction_(std::move(direction)) {}
 
-    Position GetPosition() const {
+    Point GetPosition() const {
         return position_;
     }
 
-    void SetPosition(Position position) {
+    void SetPosition(Point position) {
         position_ = std::move(position);
     }
 
@@ -38,7 +38,7 @@ class Dog {
     }
 
   private:
-    Position position_;
+    Point position_;
     Speed speed_;
     Direction direction_;
 };

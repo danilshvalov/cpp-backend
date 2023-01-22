@@ -32,7 +32,7 @@ void SessionBase::OnRead(sys::error_code ec, size_t bytes_read) {
         return Close();
     }
     if (ec) {
-        return ReportError(ec, "read");
+        return utils::ReportError(ec, "read");
     }
 
     HandleRequest(std::move(request_));
@@ -44,7 +44,7 @@ void SessionBase::OnWrite(
     size_t bytes_written
 ) {
     if (ec) {
-        ReportError(ec, "write");
+        utils::ReportError(ec, "write");
     }
     if (close) {
         return Close();
