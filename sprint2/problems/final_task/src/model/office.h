@@ -12,7 +12,7 @@ class Office {
     using Id = utils::Tagged<std::string, Office>;
 
     Office(Id id, Point position, Offset offset) noexcept :
-        id_ {std::move(id)},
+        id_ {id},
         position_ {position},
         offset_ {offset} {}
 

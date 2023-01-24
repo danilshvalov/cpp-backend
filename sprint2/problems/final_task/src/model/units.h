@@ -1,5 +1,7 @@
 #pragma once
 
+#include "utils/algorithm.h"
+
 #include <stdexcept>
 #include <cmath>
 
@@ -29,11 +31,11 @@ struct Point {
     }
 
     bool operator==(const Point& other) const {
-        return x == other.x && y == other.y;
+        return utils::AlmostEqual(x, other.x) && utils::AlmostEqual(y, other.y);
     }
 
     bool operator!=(const Point& other) const {
-        return x != other.x || y != other.y;
+        return !(*this == other);
     }
 };
 

@@ -24,7 +24,7 @@ class Map {
     };
 
     Map(Id id, std::string name, Config config) noexcept :
-        id_(std::move(id)),
+        id_(id),
         name_(std::move(name)),
         config_(std::move(config)) {}
 

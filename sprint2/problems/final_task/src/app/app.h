@@ -6,7 +6,7 @@
 #include "model/map.h"
 #include "model/game.h"
 #include "utils/tagged.h"
-#include "utils/ticker.h"
+#include "time/ticker.h"
 
 #include <boost/asio/strand.hpp>
 #include <boost/asio/io_context.hpp>

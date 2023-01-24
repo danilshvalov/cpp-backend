@@ -1,6 +1,6 @@
 #pragma once
 
-#include "utils/error.h"
+#include "logger/report.h"
 
 #include <boost/asio/bind_executor.hpp>
 #include <boost/asio/strand.hpp>
@@ -43,7 +43,7 @@ class Ticker : public std::enable_shared_from_this<Ticker> {
 
     void OnTick(sys::error_code ec) {
         if (ec) {
-            ReportError(ec, "ticker");
+            logger::ReportError(ec, "ticker");
         }
 
         auto current_tick = std::chrono::steady_clock::now();

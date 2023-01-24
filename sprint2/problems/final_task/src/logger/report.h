@@ -4,9 +4,9 @@
 
 #include <string_view>
 
-namespace utils {
+namespace logger {
 
 namespace sys = boost::system;
 void ReportError(sys::error_code ec, std::string_view what);
 
-}  // namespace utils
+}  // namespace logger

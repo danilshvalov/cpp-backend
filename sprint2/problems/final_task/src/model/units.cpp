@@ -36,7 +36,7 @@ Direction GetOppositeDirection(Direction direction) {
         case Direction::NONE:
             return Direction::NONE;
         default:
-            return Direction::NONE;
+            throw std::runtime_error("Incorrect direction");
     }
 }
 }  // namespace model

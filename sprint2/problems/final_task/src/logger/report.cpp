@@ -1,15 +1,14 @@
-#include "utils/error.h"
+#include "logger/report.h"
 #include "logger/json.h"
 
-namespace utils {
+namespace logger {
 
-namespace json = boost::json;
 namespace logging = boost::log;
 
 void ReportError(sys::error_code ec, std::string_view where) {
     BOOST_LOG_TRIVIAL(error) << logging::add_value(
                                     logger::json::additional_data,
-                                    json::value {
+                                    boost::json::value {
                                         {"code", ec.value()},
                                         {"text", ec.message()},
                                         {"where", where},
@@ -18,4 +17,4 @@ void ReportError(sys::error_code ec, std::string_view where) {
                              << "error";
 }
 
-}  // namespace utils
+}  // namespace logger

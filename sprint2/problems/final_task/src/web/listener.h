@@ -3,7 +3,7 @@
 
 #include "web/session.h"
 #include "web/utils.h"
-#include "utils/error.h"
+#include "logger/report.h"
 
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/strand.hpp>
@@ -53,7 +53,7 @@ class Listener : public std::enable_shared_from_this<Listener<RequestHandler>> {
 
     void OnAccept(sys::error_code ec, tcp::socket socket) {
         if (ec) {
-            return utils::ReportError(ec, "accept");
+            return logger::ReportError(ec, "accept");
         }
 
         AsyncRunSession(std::move(socket));
