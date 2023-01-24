@@ -25,7 +25,7 @@ def start_server():
 
 
 def start_perf(pid):
-    return f"perf record -gs -p {pid}"
+    return f"perf record -gs -p {pid} -o perf.data"
 
 
 def run(command, stdin=None, stdout=None):
