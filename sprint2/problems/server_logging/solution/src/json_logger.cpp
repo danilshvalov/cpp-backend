@@ -9,11 +9,11 @@ void JsonFormatter(
     const logging::record_view& rec,
     logging::formatting_ostream& strm
 ) {
-    auto ts = rec[timestamp];
+    json::object log;
 
-    json::object log({
-        {"timestamp", to_iso_extended_string(*ts)},
-    });
+    if (auto ts = rec[timestamp]; ts) {
+        log["timestamp"] = to_iso_extended_string(*ts);
+    }
 
     if (auto message = rec[expr::smessage]; message) {
         log["message"] = *message;
