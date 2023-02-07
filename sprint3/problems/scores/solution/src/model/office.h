@@ -1,7 +1,7 @@
 #pragma once
 
 #include "model/units.h"
-#include "model/physics/collision_detector.h"
+#include "model/physics/collision.h"
 #include "utils/tagged.h"
 
 #include <string>

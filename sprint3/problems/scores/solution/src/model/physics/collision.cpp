@@ -1,15 +1,18 @@
-#include "collision_detector.h"
+#include "collision.h"
 
-#include <cassert>
+#include <stdexcept>
 
 namespace model::physics {
 
 CollectionResult TryCollectPoint(Point a, Point b, Point c) {
     // Проверим, что перемещение ненулевое.
     // Тут приходится использовать строгое равенство, а не приближённое,
-    // пскольку при сборе заказов придётся учитывать перемещение даже на небольшое
+    // поскольку при сборе заказов придётся учитывать перемещение даже на небольшое
     // расстояние.
-    assert(b.x != a.x || b.y != a.y);
+    if (a.x == b.x && a.y == b.y) {
+        throw std::runtime_error("Path of movement cannot be zero");
+    }
+
     const double u_x = c.x - a.x;
     const double u_y = c.y - a.y;
     const double v_x = b.x - a.x;

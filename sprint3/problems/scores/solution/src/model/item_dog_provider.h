@@ -1,6 +1,6 @@
 #pragma once
 
-#include "model/physics/collision_detector.h"
+#include "model/physics/collision.h"
 
 namespace model {
 
