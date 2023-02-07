@@ -12,10 +12,11 @@ class Office {
   public:
     using Id = utils::Tagged<std::string, Office>;
 
-    Office(Id id, Point position, Offset offset) noexcept :
-        id_ {id},
-        position_ {position},
-        offset_ {offset} {}
+    Office(Id id, Point position, Offset offset, double width = 0.5) noexcept :
+        id_(id),
+        position_(position),
+        offset_(offset),
+        width_(width) {}
 
     const Id& GetId() const noexcept {
         return id_;
@@ -29,10 +30,15 @@ class Office {
         return offset_;
     }
 
+    double GetWidth() const noexcept {
+        return width_;
+    }
+
   private:
     Id id_;
     Point position_;
     Offset offset_;
+    double width_;
 };
 
 }  // namespace model

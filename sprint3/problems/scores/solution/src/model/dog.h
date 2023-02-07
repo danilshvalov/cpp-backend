@@ -11,12 +11,17 @@ namespace model {
 
 class Dog {
   public:
-    Dog(Point position, Speed speed, Direction direction, size_t bag_capacity) :
+    Dog(Point position,
+        Speed speed,
+        Direction direction,
+        size_t bag_capacity,
+        double width = 0.6) :
         position_(std::move(position)),
         prev_position_(position_),
         speed_(std::move(speed)),
         direction_(std::move(direction)),
-        bag_(bag_capacity) {}
+        bag_(bag_capacity),
+        width_(width) {}
 
     Point GetPosition() const {
         return position_;
@@ -63,12 +68,17 @@ class Dog {
         score_ = score;
     }
 
+    double GetWidth() const {
+        return width_;
+    }
+
   private:
     Point position_;
     Point prev_position_;
     Speed speed_;
     Direction direction_;
     LostObjectsBag bag_;
+    double width_;
     size_t score_ = 0;
 };
 

@@ -95,6 +95,7 @@ class GameSession : public std::enable_shared_from_this<GameSession> {
                 }
             }
         }
+        ProcessLoot();
     }
 
     const LostObjects& GetLostObjects() const {
@@ -189,22 +190,18 @@ class GameSession : public std::enable_shared_from_this<GameSession> {
 
     void ProcessLoot() {
         using namespace model;
-        constexpr double lost_objects_width = 0.0;
-        constexpr double dog_width = 0.6;
-        constexpr double office_width = 0.5;
-
         const auto& offices = map_.GetOffices();
 
         ItemDogProvider::Items items;
         items.reserve(lost_objects_.size() + offices.size());
 
         for (const auto& obj : lost_objects_) {
-            items.emplace_back(obj.GetPosition(), lost_objects_width);
+            items.emplace_back(obj.GetPosition(), obj.GetWidth());
         }
 
         size_t offices_start = items.size();
         for (const auto& office : offices) {
-            items.emplace_back(office.GetPosition(), office_width);
+            items.emplace_back(office.GetPosition(), office.GetWidth());
         }
 
         ItemDogProvider::Gatherers gatherers;
@@ -213,7 +210,7 @@ class GameSession : public std::enable_shared_from_this<GameSession> {
             gatherers.emplace_back(
                 dog.GetPrevPosition(),
                 dog.GetPosition(),
-                dog_width
+                dog.GetWidth()
             );
         }
 
@@ -226,7 +223,8 @@ class GameSession : public std::enable_shared_from_this<GameSession> {
         }
 
         for (const auto& event : events) {
-            auto& bag = dogs_[event.gatherer_id].GetBag();
+            auto& dog = dogs_[event.gatherer_id];
+            auto& bag = dog.GetBag();
 
             if (event.item_id < offices_start) {
                 auto& obj = lost_objects_[event.item_id];
@@ -240,7 +238,7 @@ class GameSession : public std::enable_shared_from_this<GameSession> {
                 if (bag.IsEmpty()) {
                     continue;
                 }
-                bag.Drop();
+                dog.SetScore(dog.GetScore() + bag.Drop());
             }
         }
 

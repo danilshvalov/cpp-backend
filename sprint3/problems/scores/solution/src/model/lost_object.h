@@ -9,7 +9,12 @@ class LostObject {
   public:
     using Id = utils::Tagged<size_t, LostObject>;
 
-    LostObject(Point position, size_t type, size_t value) noexcept :
+    LostObject(
+        Point position,
+        size_t type,
+        size_t value,
+        double width = 0.0
+    ) noexcept :
         id_ {Id(free_id_++)},
         position_ {position},
         type_(type),
@@ -39,6 +44,10 @@ class LostObject {
         return value_;
     }
 
+    double GetWidth() const {
+        return width_;
+    }
+
   private:
     inline static size_t free_id_ = 0;
 
@@ -46,6 +55,7 @@ class LostObject {
     Point position_;
     size_t type_;
     size_t value_;
+    double width_;
     bool picked_up_ = false;
 };
 
