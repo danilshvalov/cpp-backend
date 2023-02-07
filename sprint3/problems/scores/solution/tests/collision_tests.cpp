@@ -5,7 +5,7 @@
 #include <cmath>
 #include <limits>
 
-#include "model/physics/collision_detector.h"
+#include "model/physics/collision.h"
 
 using namespace Catch::Matchers;
 using namespace model::physics;
