@@ -465,16 +465,14 @@ json::value SerializeBag(const LostObjectsBag& bag) {
     return array;
 }
 
-json::value SerializeGameState(
-    const app::Application::Players& players,
-    const app::GameSession::LostObjects& lost_objects
+json::value SerializeGameStatePlayers(const app::Application::Players& players
 ) {
-    // TODO: move out
-    json::object json_players;
+    json::object object;
+
     for (const auto& player : players) {
         const model::Dog* dog = player->GetDog();
 
-        json_players[std::to_string(*player->GetId())] = json::object {
+        object[std::to_string(*player->GetId())] = json::object {
             {keys::GameState::position, SerializePosition(dog->GetPosition())},
             {keys::GameState::speed, SerializeSpeed(dog->GetSpeed())},
             {keys::GameState::direction,
@@ -484,19 +482,33 @@ json::value SerializeGameState(
         };
     }
 
-    // TODO: move out
-    json::object json_lost_objects;
+    return object;
+}
+
+json::value
+SerializeGameStateLostObjects(const app::GameSession::LostObjects& lost_objects
+) {
+    json::object object;
+
     for (const auto& lost_object : lost_objects) {
-        json_lost_objects[std::to_string(*lost_object.GetId())] = json::object {
+        object[std::to_string(*lost_object.GetId())] = json::object {
             {keys::GameState::type, lost_object.GetType()},
             {keys::GameState::position,
              SerializePosition(lost_object.GetPosition())},
         };
     }
 
+    return object;
+}
+
+json::value SerializeGameState(
+    const app::Application::Players& players,
+    const app::GameSession::LostObjects& lost_objects
+) {
     return json::object {
-        {keys::GameState::players, std::move(json_players)},
-        {keys::GameState::lost_objects, std::move(json_lost_objects)},
+        {keys::GameState::players, SerializeGameStatePlayers(players)},
+        {keys::GameState::lost_objects,
+         SerializeGameStateLostObjects(lost_objects)},
     };
 }
 

@@ -189,10 +189,9 @@ class GameSession : public std::enable_shared_from_this<GameSession> {
 
     void ProcessLoot() {
         using namespace model;
-        // TODO: move out
         constexpr double lost_objects_width = 0.0;
         constexpr double dog_width = 0.6;
-        constexpr double office_width = 0.6;
+        constexpr double office_width = 0.5;
 
         const auto& offices = map_.GetOffices();
 
