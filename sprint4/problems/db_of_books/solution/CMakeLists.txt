@@ -11,6 +11,6 @@ find_package(Threads REQUIRED)
 
 file(GLOB_RECURSE SRCS CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}/src/*.cpp)
 
-add_executable(db_of_books ${SRCS})
-target_include_directories(db_of_books PRIVATE ${CMAKE_SOURCE_DIR}/src)
-target_link_libraries(db_of_books CONAN_PKG::libpqxx CONAN_PKG::boost)
+add_executable(book_manager ${SRCS})
+target_include_directories(book_manager PRIVATE ${CMAKE_SOURCE_DIR}/src)
+target_link_libraries(book_manager CONAN_PKG::libpqxx CONAN_PKG::boost)
