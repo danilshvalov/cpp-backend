@@ -26,10 +26,6 @@ int main(int argc, const char* argv[]) {
             std::string line;
             std::getline(std::cin, line);
 
-            if (line.empty()) {
-                continue;
-            }
-
             json::value input = json::parse(line);
 
             auto output = controller.Process(input);
