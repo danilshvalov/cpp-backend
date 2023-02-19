@@ -41,6 +41,8 @@ json::value SerializeBook(const model::Book& book) {
 
     if (book.isbn) {
         object[keys::Book::isbn] = *book.isbn;
+    } else {
+        object[keys::Book::isbn] = nullptr;
     }
 
     return object;
