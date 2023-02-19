@@ -48,7 +48,7 @@ class BookTable {
     std::vector<model::Book> GetBooks() const {
         pqxx::read_transaction r(connection_);
         const auto query_text =
-            "SELECT * FROM books ORDER BY year DESC, title ASC, author ASC, ISBN ASC";
+            "SELECT * FROM books ORDER BY year DESC, title, author, ISBN"_zv;
         std::vector<model::Book> books;
 
         for (const auto& [id, title, author, year, isbn] :
