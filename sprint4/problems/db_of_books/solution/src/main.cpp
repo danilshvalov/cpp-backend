@@ -33,7 +33,7 @@ int main(int argc, const char* argv[]) {
                 break;
             }
 
-            std::cout << json::serialize(*output);
+            std::cout << json::serialize(*output) << std::endl;
         }
 
     } catch (const std::exception& e) {
