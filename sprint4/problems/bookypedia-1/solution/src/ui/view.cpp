@@ -80,6 +80,9 @@ bool View::AddAuthor(std::istream& cmd_input) const {
         std::string name;
         std::getline(cmd_input, name);
         boost::algorithm::trim(name);
+        if (name.empty()) {
+            throw std::runtime_error("Author name cannot be empty");
+        }
         use_cases_.AddAuthor(std::move(name));
     } catch (const std::exception&) {
         output_ << "Failed to add author"sv << std::endl;
@@ -131,6 +134,10 @@ std::optional<detail::AddBookParams> View::GetBookParams(std::istream& cmd_input
     cmd_input >> params.publication_year;
     std::getline(cmd_input, params.title);
     boost::algorithm::trim(params.title);
+
+    if (params.title.empty()) {
+        throw std::runtime_error("Author name cannot be empty");
+    }
 
     auto author_id = SelectAuthor();
     if (not author_id.has_value())
