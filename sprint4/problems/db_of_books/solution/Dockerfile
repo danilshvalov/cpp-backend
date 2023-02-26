@@ -1,4 +1,8 @@
-FROM gcc:11.3 as build
+FROM ubuntu/postgres:14-22.04_beta
+
+ENV POSTGRES_PASSWORD=Sd147852
+ENV POSTGRES_HOST=postgres
+ENV POSTGRES_PORT=5432
 
 RUN apt update && \
     apt install -y \
@@ -23,8 +27,6 @@ FROM ubuntu:22.04 as run
 RUN groupadd -r www && useradd -r -g www www
 USER www
 
-COPY --from=build /app/build/bin/game_server /app/
-COPY ./data /app/data
-COPY ./static /app/static
+COPY --from=build /app/build/db_of_books /app/
 
-ENTRYPOINT ["/app/game_server", "/app/data/config.json", "/app/static"]
+ENTRYPOINT ["/app/db_of_books", "/app/data/config.json", "/app/static"]
