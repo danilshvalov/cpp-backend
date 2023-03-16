@@ -23,10 +23,12 @@
 #include <unordered_map>
 #include <vector>
 #include <fstream>
+#include <filesystem>
 
 namespace app {
 
 namespace net = boost::asio;
+namespace fs = std::filesystem;
 
 struct JoinGameData {
     std::string name;
@@ -68,12 +70,6 @@ class Application {
                 strand_, tick_period,
                 [&](std::chrono::milliseconds delta) {
                     UpdateGameState(delta);
-
-                    time_without_save_ += delta;
-                    if (time_without_save_ >= save_state_config_.save_period) {
-                        time_without_save_ = std::chrono::milliseconds(0);
-                        SaveGameState();
-                    }
                 }
             );
             ticker_->Start();
@@ -106,6 +102,12 @@ class Application {
 
     void UpdateGameState(const std::chrono::milliseconds& time_delta) {
         game_sessions_.UpdateGameState(time_delta);
+
+        time_without_save_ += time_delta;
+        if (time_without_save_ >= save_state_config_.save_period) {
+            time_without_save_ = std::chrono::milliseconds(0);
+            SaveGameState();
+        }
     }
 
     JoinGameResult JoinGame(const JoinGameData& data) {
@@ -152,7 +154,14 @@ class Application {
             return;
         }
 
-        std::ofstream output(save_state_config_.state_file, std::ios::binary);
+        fs::create_directory(
+            fs::path(save_state_config_.state_file).parent_path()
+        );
+
+        const std::string output_filename =
+            save_state_config_.state_file + ".tmp";
+
+        std::ofstream output(output_filename);
         if (!output) {
             throw std::runtime_error("Cannot open state file");
         }
@@ -172,6 +181,8 @@ class Application {
         }
 
         oarchive << players;
+        output.close();
+        fs::rename(output_filename, save_state_config_.state_file);
     }
 
   private:
@@ -181,7 +192,7 @@ class Application {
             return;
         }
 
-        std::ifstream input(save_state_config_.state_file, std::ios::binary);
+        std::ifstream input(save_state_config_.state_file);
         if (!input) {
             return;
         }
