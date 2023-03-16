@@ -17,15 +17,13 @@ COPY CMakeLists.txt /app/
 
 RUN cd /app/build && \
     cmake -DCMAKE_BUILD_TYPE=Release .. && \
-    cmake --build .
+    cmake --build . --target game_server
 
 FROM ubuntu:22.04 as run
 
 RUN groupadd -r www && useradd -r -g www www
 USER www
 
-COPY --from=build /app/build/bin/game_server /app/
+COPY --from=build /app/build/game_server /app/
 COPY ./data /app/data
 COPY ./static /app/static
-
-ENTRYPOINT ["/app/game_server", "/app/data/config.json", "/app/static"]
