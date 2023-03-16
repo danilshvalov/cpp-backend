@@ -14,7 +14,6 @@ class Player {
     using Id = utils::Tagged<size_t, class PlayerTag>;
 
     Player(Id id, std::string name) : id_(id), name_(std::move(name)) {}
-    Player(std::string name) : Player(Id(free_id_++), std::move(name)) {}
 
     const Id& GetId() const {
         return id_;

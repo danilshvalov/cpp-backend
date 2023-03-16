@@ -74,6 +74,10 @@ class PlayersController {
         return players_;
     }
 
+    Player::Id GetFreePlayerId() const {
+        return Player::Id(players_.size());
+    }
+
   private:
     using Distribution =
         std::uniform_int_distribution<std::mt19937_64::result_type>;

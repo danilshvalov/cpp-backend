@@ -74,6 +74,8 @@ int main(int argc, const char* argv[]) {
                 io.run();
             });
 
+            app.SaveGameState();
+
             BOOST_LOG_TRIVIAL(info)
                 << logging::add_value(
                        logger::json::additional_data, json::value{{"code", 0}}

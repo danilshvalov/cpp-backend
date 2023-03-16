@@ -117,7 +117,9 @@ class Application {
             );
         }
 
-        auto player = std::make_shared<Player>(std::move(data.name));
+        auto player = std::make_shared<Player>(
+            players_.GetFreePlayerId(), std::move(data.name)
+        );
         Token token = players_.AddPlayer(player);
         auto game_session = game_sessions_.FindGameSessionBy(data.map_id);
 
@@ -144,14 +146,13 @@ class Application {
         return ticker_ != nullptr;
     }
 
-  private:
     void SaveGameState() {
         using namespace serde::archive;
         if (save_state_config_.state_file.empty()) {
             return;
         }
 
-        std::ofstream output(save_state_config_.state_file, std::ios_base::in);
+        std::ofstream output(save_state_config_.state_file, std::ios::binary);
         if (!output) {
             throw std::runtime_error("Cannot open state file");
         }
@@ -173,15 +174,16 @@ class Application {
         oarchive << players;
     }
 
+  private:
     void RestoreGameState() {
         using namespace serde::archive;
         if (save_state_config_.state_file.empty()) {
             return;
         }
 
-        std::ifstream input(save_state_config_.state_file, std::ios_base::in);
+        std::ifstream input(save_state_config_.state_file, std::ios::binary);
         if (!input) {
-            throw std::runtime_error("Cannot open state file");
+            return;
         }
 
         boost::archive::text_iarchive iarchive{input};
