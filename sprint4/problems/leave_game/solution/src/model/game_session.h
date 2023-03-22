@@ -90,7 +90,7 @@ class GameSession : public std::enable_shared_from_this<GameSession> {
                 dog->SetInactiveTime(std::chrono::milliseconds(0));
             }
 
-            if (dog->GetInactiveTime() > max_inactive_time_) {
+            if (dog->GetInactiveTime() >= max_inactive_time_) {
                 continue;
             }
 
@@ -125,7 +125,7 @@ class GameSession : public std::enable_shared_from_this<GameSession> {
     std::vector<DogHolder> ReleaseInactiveDogs() {
         auto it =
             std::remove_if(dogs_.begin(), dogs_.end(), [&](const auto& dog) {
-                return dog->GetInactiveTime() > max_inactive_time_;
+                return dog->GetInactiveTime() >= max_inactive_time_;
             });
 
         std::vector<DogHolder> result(
