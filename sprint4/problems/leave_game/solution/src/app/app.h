@@ -276,6 +276,7 @@ class Application {
                 dog->GetScore(),
                 dog->GetLiveTime(),
             });
+            players_.RemovePlayerByDog(dog);
         }
 
         use_cases_.SavePlayerRecords(records);
