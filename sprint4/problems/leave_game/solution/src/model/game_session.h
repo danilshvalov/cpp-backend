@@ -82,18 +82,6 @@ class GameSession : public std::enable_shared_from_this<GameSession> {
             const auto& position = dog->GetPosition();
             const auto& speed = dog->GetSpeed();
 
-            dog->SetLiveTime(dog->GetLiveTime() + time_delta);
-
-            if (speed.x == 0 && speed.y == 0) {
-                dog->SetInactiveTime(dog->GetInactiveTime() + time_delta);
-            } else {
-                dog->SetInactiveTime(std::chrono::milliseconds(0));
-            }
-
-            if (dog->GetInactiveTime() >= max_inactive_time_) {
-                continue;
-            }
-
             Point new_position = {
                 position.x + speed.x * time_delta.count() /
                                  datetime::milliseconds_in_second,
@@ -109,6 +97,18 @@ class GameSession : public std::enable_shared_from_this<GameSession> {
                     suitable_point->y != new_position.y) {
                     dog->SetSpeed(Speed(0, 0));
                 }
+            }
+
+            dog->SetLiveTime(dog->GetLiveTime() + time_delta);
+
+            if (speed.x == 0 && speed.y == 0) {
+                dog->SetInactiveTime(dog->GetInactiveTime() + time_delta);
+            } else {
+                dog->SetInactiveTime(std::chrono::milliseconds(0));
+            }
+
+            if (dog->GetInactiveTime() >= max_inactive_time_) {
+                continue;
             }
         }
         ProcessLoot();
