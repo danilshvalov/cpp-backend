@@ -101,8 +101,7 @@ class GameSession : public std::enable_shared_from_this<GameSession> {
 
             dog->SetLiveTime(dog->GetLiveTime() + time_delta);
 
-            if ((speed.x == 0 && speed.y == 0) ||
-                dog->GetDirection() == Direction::NONE) {
+            if (speed.x == 0 && speed.y == 0) {
                 dog->SetInactiveTime(dog->GetInactiveTime() + time_delta);
             } else {
                 dog->SetInactiveTime(std::chrono::milliseconds(0));

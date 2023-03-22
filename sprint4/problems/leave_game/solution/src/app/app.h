@@ -157,9 +157,14 @@ class Application {
     void MovePlayer(const Token& token, model::Direction direction) {
         PlayerHolder player = players_.FindPlayerBy(token);
         double dog_speed = player->GetSession()->GetMap().GetDogSpeed();
+        auto& dog = player->GetDog();
 
-        player->GetDog()->SetSpeed(model::Speed(dog_speed, direction));
-        player->GetDog()->SetDirection(direction);
+        dog->SetSpeed(model::Speed(dog_speed, direction));
+        dog->SetDirection(direction);
+
+        if (direction != model::Direction::NONE) {
+            dog->SetInactiveTime(std::chrono::milliseconds(0));
+        }
     }
 
     bool HasTickPeriod() const {

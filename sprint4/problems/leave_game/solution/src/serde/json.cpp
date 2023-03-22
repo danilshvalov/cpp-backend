@@ -282,7 +282,9 @@ Game LoadGame(const std::filesystem::path& json_path) {
         document.at(keys::Game::loot_generator_config).as_object()
     );
 
-    std::chrono::milliseconds max_inactive_time{1000};
+    std::chrono::milliseconds max_inactive_time{
+        static_cast<int64_t>(60 * datetime::milliseconds_in_second),
+    };
     if (auto it = document.find(keys::Game::dog_retirement_time);
         it != document.end()) {
         max_inactive_time = std::chrono::milliseconds(static_cast<int64_t>(
