@@ -42,7 +42,7 @@ class ApiHandlerImpl {
             return HandlePlayerAction();
         }
 
-        if (target == "/game/records") {
+        if (target.starts_with("/game/records")) {
             return HandleRecordsAction();
         }
 
