@@ -13,6 +13,9 @@ namespace model {
 
 class Dog {
   public:
+    Dog(Point position, size_t bag_capacity, double width = 0.6) :
+        Dog(position, Speed(0, 0), Direction::NORTH, bag_capacity, width) {}
+
     Dog(Point position, Speed speed, Direction direction, size_t bag_capacity,
         double width = 0.6) :
         position_(std::move(position)),

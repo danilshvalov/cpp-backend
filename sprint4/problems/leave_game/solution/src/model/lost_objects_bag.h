@@ -21,12 +21,12 @@ class LostObjectsBag {
         return lost_objects_.empty();
     }
 
-    void Add(LostObject lost_object) {
+    bool Add(LostObject lost_object) {
         if (IsFull()) {
-            throw std::runtime_error("Adding an object to an overflowing bag");
+            return false;
         }
-
         lost_objects_.push_back(std::move(lost_object));
+        return true;
     }
 
     size_t Drop() {
@@ -45,6 +45,10 @@ class LostObjectsBag {
 
     size_t Size() const {
         return lost_objects_.size();
+    }
+
+    const LostObjects& GetContent() const {
+        return lost_objects_;
     }
 
     using iterator = typename LostObjects::iterator;

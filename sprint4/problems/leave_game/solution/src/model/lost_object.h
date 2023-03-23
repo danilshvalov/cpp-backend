@@ -50,6 +50,14 @@ class LostObject {
         return width_;
     }
 
+    bool operator==(const LostObject& other) const {
+        return std::tie(id_, position_, type_, value_, width_, picked_up_) ==
+               std::tie(
+                   other.id_, other.position_, other.type_, other.value_,
+                   other.width_, other.picked_up_
+               );
+    }
+
   private:
     inline static size_t free_id_ = 0;
 
