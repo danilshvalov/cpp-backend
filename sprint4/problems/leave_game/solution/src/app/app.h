@@ -27,6 +27,8 @@
 #include <fstream>
 #include <filesystem>
 
+#include <iostream>
+
 namespace app {
 
 namespace net = boost::asio;
@@ -271,17 +273,14 @@ class Application {
     void ProcessInactiveDogs(const std::vector<model::DogHolder>& dogs) {
         std::vector<PlayerRecord> records;
 
-        for (const auto& dog : dogs) {
-            auto player = players_.GetPlayerByDog(dog);
-            if (!player) {
-                continue;
-            }
+        for (const auto& player :
+             players_.RemoveInactivePlayers(game_.GetMaxInactiveTime())) {
+            const auto& dog = player->GetDog();
             records.push_back(PlayerRecord{
                 player->GetName(),
                 dog->GetScore(),
                 dog->GetLiveTime(),
             });
-            players_.RemovePlayerByDog(dog);
         }
 
         use_cases_.SavePlayerRecords(records);

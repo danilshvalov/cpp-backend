@@ -93,6 +93,29 @@ class PlayersController {
         return it->second;
     }
 
+    std::vector<PlayerHolder>
+    RemoveInactivePlayers(const std::chrono::milliseconds& max_inactive_time) {
+        for (auto& [_, players] : session_players_) {
+            std::erase_if(players, [&](const auto& player) {
+                return player->GetDog()->GetInactiveTime() >= max_inactive_time;
+            });
+        }
+
+        std::vector<PlayerHolder> result;
+        for (const auto& [_, player] : players_) {
+            if (player->GetDog()->GetInactiveTime() >= max_inactive_time) {
+                result.push_back(player);
+            }
+        }
+
+        std::erase_if(players_, [&](const auto& data) {
+            const PlayerHolder& player = data.second;
+            return player->GetDog()->GetInactiveTime() >= max_inactive_time;
+        });
+
+        return result;
+    }
+
     void RemovePlayerByDog(const model::DogHolder& dog) {
         for (auto& [_, players] : session_players_) {
             std::erase_if(players, [&](const auto& player) {
