@@ -1,5 +1,4 @@
 #pragma once
-#define BOOST_BEAST_USE_STD_STRING_VIEW
 
 #include "web/core.h"
 #include "logger/json.h"
@@ -25,15 +24,14 @@ class SessionBase {
 
     void Run();
 
-    template<typename Body, typename Fields>
+    template <typename Body, typename Fields>
     void Write(http::response<Body, Fields>&& response) {
         auto safe_response =
             std::make_shared<http::response<Body, Fields>>(std::move(response));
 
         auto self = GetSharedThis();
         http::async_write(
-            stream_,
-            *safe_response,
+            stream_, *safe_response,
             [safe_response, self](sys::error_code ec, size_t bytes_written) {
                 self->OnWrite(safe_response->need_eof(), ec, bytes_written);
             }
@@ -67,12 +65,11 @@ class SessionBase {
     StringRequest request_;
 };
 
-template<typename RequestHandler>
-class Session :
-    public SessionBase,
-    public std::enable_shared_from_this<Session<RequestHandler>> {
+template <typename RequestHandler>
+class Session : public SessionBase,
+                public std::enable_shared_from_this<Session<RequestHandler>> {
   public:
-    template<typename Handler>
+    template <typename Handler>
     Session(tcp::socket&& socket, Handler&& request_handler) :
         SessionBase(std::move(socket)),
         request_handler_(std::forward<Handler>(request_handler)) {}
@@ -82,12 +79,12 @@ class Session :
         return this->shared_from_this();
     }
 
-    template<typename Body, typename Allocator>
+    template <typename Body, typename Allocator>
     void LogRequest(const HttpRequest<Body, Allocator>& request) const {
         BOOST_LOG_TRIVIAL(info)
             << logging::add_value(
                    logger::json::additional_data,
-                   json::value {
+                   json::value{
                        {"ip", GetRemoteEndpoint().address().to_string()},
                        {"URI", request.target()},
                        {"method", request.method_string()},
@@ -96,14 +93,14 @@ class Session :
             << "request received";
     }
 
-    template<typename Body, typename Allocator>
+    template <typename Body, typename Allocator>
     void LogResponse(const HttpResponse<Body, Allocator>& response) const {
         auto response_time =
             std::chrono::duration_cast<std::chrono::milliseconds>(
                 std::chrono::system_clock::now() - receive_time_
             );
 
-        json::object response_log {
+        json::object response_log{
             {"response_time", response_time.count()},
             {"code", response.result_int()},
         };
@@ -137,4 +134,4 @@ class Session :
     std::chrono::system_clock::time_point receive_time_;
 };
 
-}  // namespace web
+} // namespace web

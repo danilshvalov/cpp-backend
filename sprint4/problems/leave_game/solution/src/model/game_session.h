@@ -122,19 +122,8 @@ class GameSession : public std::enable_shared_from_this<GameSession> {
         return lost_objects_;
     }
 
-    std::vector<DogHolder> ReleaseInactiveDogs() {
-        auto it =
-            std::remove_if(dogs_.begin(), dogs_.end(), [&](const auto& dog) {
-                return dog->GetInactiveTime() >= max_inactive_time_;
-            });
-
-        std::vector<DogHolder> result(
-            std::make_move_iterator(it), std::make_move_iterator(dogs_.end())
-        );
-
-        dogs_.erase(it, dogs_.end());
-
-        return result;
+    void RemoveDog(const DogHolder& dog) {
+        std::erase(dogs_, dog);
     }
 
   private:

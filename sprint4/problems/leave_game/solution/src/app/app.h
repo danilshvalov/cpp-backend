@@ -121,7 +121,7 @@ class Application {
 
     void UpdateGameState(const std::chrono::milliseconds& time_delta) {
         game_sessions_.UpdateGameState(time_delta);
-        ProcessInactiveDogs(game_sessions_.ReleaseInactiveDogs());
+        ProcessInactiveDogs();
 
         time_without_save_ += time_delta;
         if (time_without_save_ >= config_.save_state.save_period) {
@@ -270,7 +270,7 @@ class Application {
         players_.SetPlayerSession(player, session);
     }
 
-    void ProcessInactiveDogs(const std::vector<model::DogHolder>& dogs) {
+    void ProcessInactiveDogs() {
         std::vector<PlayerRecord> records;
 
         for (const auto& player :
@@ -281,6 +281,7 @@ class Application {
                 dog->GetScore(),
                 dog->GetLiveTime(),
             });
+            player->GetSession()->RemoveDog(dog);
         }
 
         use_cases_.SavePlayerRecords(records);

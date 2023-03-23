@@ -1,5 +1,4 @@
 #pragma once
-#define BOOST_BEAST_USE_STD_STRING_VIEW
 
 #include "web/session.h"
 #include "web/utils.h"
@@ -18,13 +17,12 @@ namespace net = boost::asio;
 using tcp = net::ip::tcp;
 namespace beast = boost::beast;
 
-template<typename RequestHandler>
+template <typename RequestHandler>
 class Listener : public std::enable_shared_from_this<Listener<RequestHandler>> {
   public:
-    template<typename Handler>
+    template <typename Handler>
     Listener(
-        net::io_context& io,
-        const tcp::endpoint& endpoint,
+        net::io_context& io, const tcp::endpoint& endpoint,
         Handler&& request_handler
     ) :
         io_(io),
@@ -45,8 +43,7 @@ class Listener : public std::enable_shared_from_this<Listener<RequestHandler>> {
         acceptor_.async_accept(
             net::make_strand(io_),
             beast::bind_front_handler(
-                &Listener::OnAccept,
-                this->shared_from_this()
+                &Listener::OnAccept, this->shared_from_this()
             )
         );
     }
@@ -62,8 +59,7 @@ class Listener : public std::enable_shared_from_this<Listener<RequestHandler>> {
 
     void AsyncRunSession(tcp::socket&& socket) {
         std::make_shared<Session<RequestHandler>>(
-            std::move(socket),
-            request_handler_
+            std::move(socket), request_handler_
         )
             ->Run();
     }
@@ -73,4 +69,4 @@ class Listener : public std::enable_shared_from_this<Listener<RequestHandler>> {
     RequestHandler request_handler_;
 };
 
-}  // namespace web
+} // namespace web

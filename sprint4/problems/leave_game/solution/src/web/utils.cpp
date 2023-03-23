@@ -1,5 +1,3 @@
-#define BOOST_BEAST_USE_STD_STRING_VIEW
-
 #include "web/utils.h"
 #include "web/content_type.h"
 
@@ -83,4 +81,4 @@ std::string_view GetMimeType(std::string_view path) {
     }
 }
 
-}  // namespace web
+} // namespace web

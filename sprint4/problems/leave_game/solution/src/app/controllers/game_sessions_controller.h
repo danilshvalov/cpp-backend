@@ -52,18 +52,6 @@ class GameSessionsController {
         return sessions_;
     }
 
-    std::vector<model::DogHolder> ReleaseInactiveDogs() {
-        std::vector<model::DogHolder> result;
-        for (auto& session : sessions_) {
-            auto dogs = session->ReleaseInactiveDogs();
-            result.insert(
-                result.end(), std::make_move_iterator(dogs.begin()),
-                std::make_move_iterator(dogs.end())
-            );
-        }
-        return result;
-    }
-
   private:
     using MapIdToIndex = std::unordered_map<
         model::Map::Id, size_t, utils::TaggedHasher<model::Map::Id>>;
