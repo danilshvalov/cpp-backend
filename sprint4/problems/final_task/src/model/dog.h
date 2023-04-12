@@ -61,7 +61,9 @@ class Dog {
     }
 
     void SetDirection(Direction direction) {
-        direction_ = std::move(direction);
+        if (direction != Direction::NONE) {
+            direction_ = std::move(direction);
+        }
     }
 
     const LostObjectsBag& GetBag() const {
